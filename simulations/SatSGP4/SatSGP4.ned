@@ -4,13 +4,14 @@ import leosatellites.base.BasicSatellite;
 import leosatellites.base.LaserSatellite;
 import leosatellites.base.GroundStation;
 import os3.base.MissionControlCenter;
-import inet.physicallayer.contract.packetlevel.IRadioMedium;
-import inet.physicallayer.apskradio.packetlevel.ApskScalarRadioMedium;
+import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
+import inet.physicallayer.wireless.apsk.packetlevel.ApskScalarRadioMedium;
 import os3.base.CNI_OS3;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import leosatellites.networklayer.configurator.ipv4.SatelliteNetworkConfigurator;
 import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.visualizer.contract.IIntegratedVisualizer;
+import inet.visualizer.common.IntegratedVisualizer;
 import inet.node.inet.WirelessHost;
 import inet.node.inet.INetworkNode;
 
@@ -36,7 +37,7 @@ network SatSGP4
         //@statistic[rtt](source=count(MCC[0].app[0].rtt); record=figure; targetFigure=rttCounter; checkSignals=false);
         //@figure[rttCounter](type=plot; pos=600,50; label="Round Trip Time");
     submodules:
-        visualizer: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
+        visualizer: IntegratedVisualizer {  //<default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
             @display("p=305.665,67.625`");
         }
         configurator: SatelliteNetworkConfigurator {

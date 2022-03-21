@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>inet4</project>
+		<project>inet4.3</project>
 		<project>os3</project>
 	</projects>
 	<buildSpec>

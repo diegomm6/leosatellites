@@ -23,7 +23,11 @@
 // This class accepts a single satellite's Keplerian elements and provides information
 // regarding the satellite's orbit such as period, axis length,
 // ECI coordinates/velocity, etc., using the SGP4/SDP4 orbital models.
-cOrbitA::cOrbitA(std::string satNameA, int epochY, double epochD, double mMotion, double ecc, double incl, double meanAnom, double bstarA, double dragA, int phaseOffset, int satIndex, int planes, int satPerPlane) :
+// New modification introduced on 18-03-2022 by Diego Maldonado
+// cOrbitA constructor now admits raan and meanAnomaly arguments in
+// order to allow the definition of particular orbits for each satellite
+cOrbitA::cOrbitA(std::string satNameA, int epochY, double epochD, double mMotion, double ecc, double incl, double meanAnom, double bstarA,
+        double dragA, int satIndex, int planes, int satPerPlane, int raanA) :
    m_pNoradModel(NULL)
 {
    satName = satNameA;
@@ -31,17 +35,25 @@ cOrbitA::cOrbitA(std::string satNameA, int epochY, double epochD, double mMotion
    epochDay = epochD;
    meanMotion = mMotion;
    eccentricity = ecc;
-   inclination = incl;
-   meanAnomaly = meanAnom;
+   inclination = incl*RADS_PER_DEG;
+   meanAnomaly = meanAnom*RADS_PER_DEG;
    argPerigee = 0; //*RADS_PER_DEG;
    bstar = bstarA;
    drag = dragA;
-   //int offsetVal = planes; //offsetVal must be changed according to constellation, used to prevent collisions
-   int currentPlane = trunc(satIndex/satPerPlane);
-   int planeIndex = (satIndex % (planes*satPerPlane))-(satPerPlane*currentPlane); //index of a satellite within a plane
-   raan = ((360.0/planes)*currentPlane) * RADS_PER_DEG; //RAAN value, uniformly created so that there are equally spaced orbital planes for even coverage.
-   double phaseOffsetVal = ((360.0/satPerPlane)*(phaseOffset/planes))*currentPlane;
-   meanAnomaly = (((360.0/satPerPlane)*planeIndex))*RADS_PER_DEG; //Denotes the position of a satellite within its plane.
+   raan = raanA*RADS_PER_DEG;
+
+
+   //int currentPlane = trunc(satIndex/satPerPlane);
+
+   //index of a satellite within a plane
+   //int planeIndex = (satIndex % (planes*satPerPlane))-(satPerPlane*currentPlane);
+
+   //RAAN value, uniformly created so that there are equally spaced orbital planes for even coverage.
+   // raan = ((360.0/planes)*currentPlane) * RADS_PER_DEG;
+
+   //Denotes the position of a satellite within its plane.
+   // meanAnomaly = (((360.0/satPerPlane)*planeIndex))*RADS_PER_DEG;
+
    if (epochYear < 57)
       epochYear += 2000;
    else

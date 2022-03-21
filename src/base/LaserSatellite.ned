@@ -1,4 +1,3 @@
-
 package leosatellites.base;
 
 import inet.mobility.contract.IMobility;
