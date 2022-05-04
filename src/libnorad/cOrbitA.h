@@ -23,7 +23,7 @@ class cNoradBaseA;
 class cOrbitA
 {
 public:
-   cOrbitA(std::string satNameA, int epochY, double epochD, double mMotion, double ecc, double incl, double meanAnom, double bstarA,
+   cOrbitA(std::string satNameA, int epochY, double epochD, double altitude, double ecc, double incl, double meanAnom, double bstarA,
            double dragA, int satIndex, int planes, int satPerPlane, int raanA);
    virtual ~cOrbitA();
 

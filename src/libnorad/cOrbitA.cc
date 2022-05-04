@@ -26,14 +26,13 @@
 // New modification introduced on 18-03-2022 by Diego Maldonado
 // cOrbitA constructor now admits raan and meanAnomaly arguments in
 // order to allow the definition of particular orbits for each satellite
-cOrbitA::cOrbitA(std::string satNameA, int epochY, double epochD, double mMotion, double ecc, double incl, double meanAnom, double bstarA,
+cOrbitA::cOrbitA(std::string satNameA, int epochY, double epochD, double altitude, double ecc, double incl, double meanAnom, double bstarA,
         double dragA, int satIndex, int planes, int satPerPlane, int raanA) :
    m_pNoradModel(NULL)
 {
    satName = satNameA;
    epochYear = epochY;
    epochDay = epochD;
-   meanMotion = mMotion;
    eccentricity = ecc;
    inclination = incl*RADS_PER_DEG;
    meanAnomaly = meanAnom*RADS_PER_DEG;
@@ -62,6 +61,9 @@ cOrbitA::cOrbitA(std::string satNameA, int epochY, double epochD, double mMotion
    m_jdEpoch = cJulian(epochYear, epochDay);
 
    m_secPeriod = -1.0;
+
+   double velocity = sqrt(GM/(XKMPER_WGS72+altitude));
+   meanMotion = SEC_PER_DAY/((TWOPI*(XKMPER_WGS72+altitude))/velocity);
 
    // Recover the original mean motion and semimajor axis from the
    // input elements.

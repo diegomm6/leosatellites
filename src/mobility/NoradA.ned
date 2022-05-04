@@ -17,7 +17,7 @@ parameters:
     double epochDay = default(86.49033611);
     double eccentricity = default(0.0001698);
     double inclination = default(53); 	  //consistent between satellites
-    double meanMotion = default(15.15306312100295);    //consistent between satellites
+    double altitude = default(550);       //consistent between satellites
     double meanAnomaly = default(0);
     double raan = default(0);
     
