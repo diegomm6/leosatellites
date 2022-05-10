@@ -24,6 +24,9 @@ parameters:
     double bstar = default(0.00042243);
     double drag = default(0.00001846);
     
+    int baseYear = default(21);
+    double baseDay = default(86.49033611);
+    
 	int planes = default(1);
 	int satPerPlane = default(1);
     @display("i=msg/book");

@@ -58,11 +58,18 @@ void NoradA::initializeMobility(const simtime_t& targetTime)
     double raanA = par("raan");
     planes = par("planes");
     satPerPlane = par("satPerPlane");
-
-    //std::string satelliteName = getParentModule()->par("satelliteName").stringValue();
+    int baseY = par("baseYear");
+    double baseD = par("baseDay");
 
     //The new cOrbitA orbital propagator class is called which passes these Keplerian elements rather than the TLE file.
     orbit = new cOrbitA(satNameA, epochY, epochD, altitude, ecc, incl, meanAnom, bstarA, dragA, satIndex, planes, satPerPlane, raanA);
+
+    // set the internal calendar time at which the simulation takes place
+    if (baseY < 57)
+        baseY += 2000;
+    else
+        baseY += 1900;
+    currentJulian = cJulian(baseY, baseD);
 
     // Gap is needed to eliminate different start times
     gap = orbit->TPlusEpoch(currentJulian);

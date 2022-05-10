@@ -22,7 +22,6 @@ SatelliteMobility::SatelliteMobility()
 void SatelliteMobility::initialize(int stage)
 {
     // noradModule must be initialized before LineSegmentsMobilityBase calling setTargetPosition() in its initialization at stage 1
-
     if (stage == INITSTAGE_PHYSICAL_ENVIRONMENT) {
         noradModule->initializeMobility(nextChange);
     }
@@ -32,10 +31,10 @@ void SatelliteMobility::initialize(int stage)
         error("Error in SatSGP4Mobility::initializeMobility(): Cannot find module Norad.");
     }
 
-    //std::time_t timestamp = std::time(nullptr);       // get current time as an integral value holding the num of secs
-    std::time_t timestamp =  1577904000;              // 01-01-2020 18:40:00 UTC                                   // since 00:00, Jan 1 1970 UTC
-    std::tm* currentTime = std::gmtime(&timestamp);   // convert timestamp into structure holding a calendar date and time
-    noradModule->setJulian(currentTime);
+    // get current time as an integral value holding the num of secs since 00:00, Jan 1 1970 UTC
+    //std::time_t timestamp =  1577904000;              // 01-01-2020 18:40:00 UTC
+    //std::tm* currentTime = std::gmtime(&timestamp);   // convert timestamp into structure holding a calendar date and time
+    //noradModule->setJulian(currentTime);
 
     mapX = std::atoi(getParentModule()->getParentModule()->getDisplayString().getTagArg("bgb", 0));
     mapY = std::atoi(getParentModule()->getParentModule()->getDisplayString().getTagArg("bgb", 1));
