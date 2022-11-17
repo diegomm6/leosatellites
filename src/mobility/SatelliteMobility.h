@@ -18,6 +18,7 @@
 
 #include "inet/common/INETDefs.h"
 #include <inet/mobility/base/LineSegmentsMobilityBase.h>
+#include "../libnorad/cEcef.h"
 #include "INorad.h"
 
 //-----------------------------------------------------
@@ -59,10 +60,20 @@ public:
     // returns satellite longitude
     virtual double getLongitude() const;
 
+    // returns horizontal satellite position (x) in canvas
+    double getXCanvas(double lon) const;
+
+    // returns vertical satellite position (y) in canvas
+    double getYCanvas(double lat) const;
+
 protected:
     INorad* noradModule;
     int mapX, mapY;
     double transmitPower;
+    cPolygonFigure *polygon;
+    const int nPoints = 51;
+    cCanvas *networkCanvas = nullptr;
+    cMessage *refreshArea = nullptr;
 
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
 
@@ -84,6 +95,10 @@ protected:
 
     // implements basic satellite movement on map
     virtual void move() override;
+
+    virtual void handleSelfMessage(cMessage *msg);
+    void removeAllPoints();
+    void setAllPoints();
 };
 }// namespace inet
 #endif

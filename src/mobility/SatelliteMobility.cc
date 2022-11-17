@@ -41,6 +41,24 @@ void SatelliteMobility::initialize(int stage)
 
     EV << "initializing SatSGP4Mobility stage " << stage << endl;
     WATCH(lastPosition);
+
+    bool displaySpanArea = par("displaySpanArea");
+    if (stage == INITSTAGE_LAST && displaySpanArea)
+    {
+        refreshArea = new cMessage("refreshArea");
+        polygon = new cPolygonFigure("polygon");
+        polygon->setNumPoints(nPoints);
+        polygon->setSmooth(true);
+        polygon->setFilled(true);
+        polygon->setLineWidth(1);
+        polygon->setFillOpacity(0.15);
+        polygon->setLineColor(cFigure::RED);
+        polygon->setFillColor(cFigure::RED);
+        setAllPoints();
+        networkCanvas = getParentModule()->getParentModule()->getCanvas();
+        networkCanvas->addFigure(polygon);
+        scheduleAt(simTime() + updateInterval, refreshArea);
+    }
 }
 
 void SatelliteMobility::initializePosition()
@@ -99,17 +117,106 @@ void SatelliteMobility::setTargetPosition()
 {
     nextChange += updateInterval.dbl();
     noradModule->updateTime(nextChange);
-    lastPosition.x = mapX * noradModule->getLongitude() / 360 + (mapX / 2);
-    lastPosition.x = static_cast<int>(lastPosition.x) % static_cast<int>(mapX);
-    lastPosition.y = ((-mapY * noradModule->getLatitude()) / 180) + (mapY / 2);
+    lastPosition.x = getXCanvas(getLongitude());  // x canvas position, longitude projection
+    lastPosition.y = getYCanvas(getLatitude());   // y canvas position, latitude projection
+    lastPosition.z = getAltitude();               // real satellite altitude in km
     targetPosition.x = lastPosition.x;
     targetPosition.y = lastPosition.y;
+    targetPosition.z = lastPosition.z;
+}
+
+double SatelliteMobility::getXCanvas(double lon) const
+{
+    double x = mapX * lon / 360 + (mapX / 2);
+    return static_cast<int>(x) % static_cast<int>(mapX);
+}
+
+double SatelliteMobility::getYCanvas(double lat) const
+{
+    return ((-mapY * lat) / 180) + (mapY / 2);
 }
 
 void SatelliteMobility::move()
 {
     LineSegmentsMobilityBase::move();
     raiseErrorIfOutside();
+}
+
+void SatelliteMobility::handleSelfMessage(cMessage *msg)
+{
+    if (msg == refreshArea)
+    {
+        polygon->setVisible(false);
+        removeAllPoints();
+        setAllPoints();
+        polygon->setVisible(true);
+        scheduleAt(simTime() + updateInterval, refreshArea);
+    }
+}
+
+void SatelliteMobility::removeAllPoints()
+{
+    for (int i = 0; i < nPoints; i++)
+        polygon->removePoint(0);
+    polygon->setNumPoints(nPoints);
+}
+
+void SatelliteMobility::setAllPoints()
+{
+    double alt = lastPosition.z;               // altitude
+    double r = XKMPER_WGS72;                   // earth radius
+    double slant = sqrt(alt*alt + 2*r*alt);    // slant range
+    double alpha = atan(slant/r);              // view angle
+
+    double b;
+    double xi, yi, xCanvas, yCanvas;
+
+    // satellite projection on Earth
+    cEcef *P = new cEcef(getLatitude(), getLongitude(), r);
+    Coord *Px = new Coord(P->getX(), P->getY(), P->getZ());
+
+    // null island on Earth
+    cEcef *O = new cEcef(0, 0, r);
+    Coord *Ox = new Coord(O->getX(), O->getY(), O->getZ());
+
+    // get cross and dot products
+    Coord cross = *Ox % *Px;
+    double angle = Px->angle(*Ox);
+    cross.normalize();
+
+    // get rotation quaternion
+    Quaternion *q = new Quaternion(cross, angle);
+
+    delete P;
+    delete O;
+    delete Px;
+    delete Ox;
+
+    // solve span area perimeter points centered around O, then apply rotation
+    for (int i=0; i < nPoints-1; i++)
+    {
+        b = i*TWOPI/nPoints;
+        xi = alpha*cos(b)/RADS_PER_DEG; // longitude
+        yi = alpha*sin(b)/RADS_PER_DEG; // latitude
+
+        cEcef *pointEcef = new cEcef(yi, xi, r);
+        Coord *pointCoord = new Coord(pointEcef->getX(), pointEcef->getY(), pointEcef->getZ());
+
+        Coord rotatedCoord = q->rotate(*pointCoord);
+        cEcef *rotatedEcef = new cEcef(rotatedCoord.getX(), rotatedCoord.getY(), rotatedCoord.getZ(), 0);
+
+        xCanvas = getXCanvas(rotatedEcef->getLongitude());
+        yCanvas = getYCanvas(rotatedEcef->getLatitude());
+        polygon->setPoint(i, cFigure::Point(xCanvas, yCanvas));
+
+        delete pointEcef;
+        delete pointCoord;
+        delete rotatedEcef;
+
+        //EV << "point lon: " << rotatedEcef->getLongitude() << "; point lat: " << rotatedEcef->getLatitude()<< endl;
+    }
+
+    polygon->setPoint(nPoints-1, polygon->getPoint(0));
 }
 
 void SatelliteMobility::fixIfHostGetsOutside()

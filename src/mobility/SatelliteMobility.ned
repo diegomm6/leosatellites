@@ -9,4 +9,5 @@ simple SatelliteMobility extends SatSGP4Mobility
 {
     parameters:
         @class("inet::SatelliteMobility");
+        bool displaySpanArea = default(false);
 }
