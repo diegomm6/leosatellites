@@ -96,8 +96,13 @@ protected:
     // implements basic satellite movement on map
     virtual void move() override;
 
-    virtual void handleSelfMessage(cMessage *msg);
+    // move satellite and update span area
+    virtual void handleSelfMessage(cMessage *msg) override;
+
+    // remove all points from span area polygon
     void removeAllPoints();
+
+    // set all points from span area polygon
     void setAllPoints();
 };
 }// namespace inet

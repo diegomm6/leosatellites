@@ -57,7 +57,7 @@ void SatelliteMobility::initialize(int stage)
         setAllPoints();
         networkCanvas = getParentModule()->getParentModule()->getCanvas();
         networkCanvas->addFigure(polygon);
-        scheduleAt(simTime() + updateInterval, refreshArea);
+        //scheduleAt(simTime() + updateInterval, refreshArea);
     }
 }
 
@@ -144,14 +144,12 @@ void SatelliteMobility::move()
 
 void SatelliteMobility::handleSelfMessage(cMessage *msg)
 {
-    if (msg == refreshArea)
-    {
-        polygon->setVisible(false);
-        removeAllPoints();
-        setAllPoints();
-        polygon->setVisible(true);
-        scheduleAt(simTime() + updateInterval, refreshArea);
-    }
+    moveAndUpdate();
+    scheduleUpdate();
+    polygon->setVisible(false);
+    removeAllPoints();
+    setAllPoints();
+    polygon->setVisible(true);
 }
 
 void SatelliteMobility::removeAllPoints()
@@ -167,9 +165,7 @@ void SatelliteMobility::setAllPoints()
     double r = XKMPER_WGS72;                   // earth radius
     double slant = sqrt(alt*alt + 2*r*alt);    // slant range
     double alpha = atan(slant/r);              // view angle
-
-    double b;
-    double xi, yi, xCanvas, yCanvas;
+    double b, xi, yi, xCanvas, yCanvas;
 
     // satellite projection on Earth
     cEcef *P = new cEcef(getLatitude(), getLongitude(), r);
