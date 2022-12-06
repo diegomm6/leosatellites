@@ -42,7 +42,7 @@ void SatelliteMobility::initialize(int stage)
     EV << "initializing SatSGP4Mobility stage " << stage << endl;
     WATCH(lastPosition);
 
-    bool displaySpanArea = par("displaySpanArea");
+    displaySpanArea = par("displaySpanArea");
     if (stage == INITSTAGE_LAST && displaySpanArea)
     {
         refreshArea = new cMessage("refreshArea");
@@ -57,7 +57,8 @@ void SatelliteMobility::initialize(int stage)
         setAllPoints();
         networkCanvas = getParentModule()->getParentModule()->getCanvas();
         networkCanvas->addFigure(polygon);
-        //scheduleAt(simTime() + updateInterval, refreshArea);
+
+        EV << "satellite position is lat= " << getLatitude() << "; lon= " << getLongitude() << endl;
     }
 }
 
@@ -146,10 +147,13 @@ void SatelliteMobility::handleSelfMessage(cMessage *msg)
 {
     moveAndUpdate();
     scheduleUpdate();
-    polygon->setVisible(false);
-    removeAllPoints();
-    setAllPoints();
-    polygon->setVisible(true);
+    if (displaySpanArea)
+    {
+        polygon->setVisible(false);
+        removeAllPoints();
+        setAllPoints();
+        polygon->setVisible(true);
+    }
 }
 
 void SatelliteMobility::removeAllPoints()

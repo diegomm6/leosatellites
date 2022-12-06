@@ -70,6 +70,7 @@ protected:
     INorad* noradModule;
     int mapX, mapY;
     double transmitPower;
+    bool displaySpanArea;
     cPolygonFigure *polygon;
     const int nPoints = 51;
     cCanvas *networkCanvas = nullptr;
