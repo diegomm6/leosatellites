@@ -42,6 +42,7 @@ void SatelliteMobility::initialize(int stage)
     EV << "initializing SatSGP4Mobility stage " << stage << endl;
     WATCH(lastPosition);
 
+    effectiveSlant = par("effectiveSlant");
     displaySpanArea = par("displaySpanArea");
     if (stage == INITSTAGE_LAST && displaySpanArea)
     {
@@ -165,10 +166,13 @@ void SatelliteMobility::removeAllPoints()
 
 void SatelliteMobility::setAllPoints()
 {
-    double alt = lastPosition.z;               // altitude
-    double r = XKMPER_WGS72;                   // earth radius
-    double slant = sqrt(alt*alt + 2*r*alt);    // slant range
-    double alpha = atan(slant/r);              // view angle
+    double alt = lastPosition.z;         // altitude
+    double r = XKMPER_WGS72;             // earth radius
+    double r2 = r*r;
+    double alt2 = alt*alt;
+    double hr = alt*r;
+    double slant = sqrt(alt2 + 2*hr);    // slant range
+    double alpha = atan(slant/r);        // view angle
     double b, xi, yi, xCanvas, yCanvas;
 
     // satellite projection on Earth
@@ -192,12 +196,22 @@ void SatelliteMobility::setAllPoints()
     delete Px;
     delete Ox;
 
+    // effective area considering max range given lora parameters
+    double slantAngle=alpha;
+    if (effectiveSlant>0)
+    {
+        double x = 2*r2 + 2*hr;
+        double z = (x + alt2 - effectiveSlant*effectiveSlant) / x;
+        double beta = acos(z);
+        slantAngle=beta;
+    }
+
     // solve span area perimeter points centered around O, then apply rotation
     for (int i=0; i < nPoints-1; i++)
     {
         b = i*TWOPI/nPoints;
-        xi = alpha*cos(b)/RADS_PER_DEG; // longitude
-        yi = alpha*sin(b)/RADS_PER_DEG; // latitude
+        xi = slantAngle*cos(b)/RADS_PER_DEG; // longitude
+        yi = slantAngle*sin(b)/RADS_PER_DEG; // latitude
 
         cEcef *pointEcef = new cEcef(yi, xi, r);
         Coord *pointCoord = new Coord(pointEcef->getX(), pointEcef->getY(), pointEcef->getZ());

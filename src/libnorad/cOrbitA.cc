@@ -27,7 +27,7 @@
 // cOrbitA constructor now admits raan and meanAnomaly arguments in
 // order to allow the definition of particular orbits for each satellite
 cOrbitA::cOrbitA(std::string satNameA, int epochY, double epochD, double altitude, double ecc, double incl, double meanAnom, double bstarA,
-        double dragA, int satIndex, int planes, int satPerPlane, int raanA) :
+        double dragA, int satIndex, int planes, int satPerPlane, double raanA, double argPerigeeA) :
    m_pNoradModel(NULL)
 {
    satName = satNameA;
@@ -36,7 +36,7 @@ cOrbitA::cOrbitA(std::string satNameA, int epochY, double epochD, double altitud
    eccentricity = ecc;
    inclination = incl*RADS_PER_DEG;
    meanAnomaly = meanAnom*RADS_PER_DEG;
-   argPerigee = 0; //*RADS_PER_DEG;
+   argPerigee = argPerigeeA*RADS_PER_DEG;
    bstar = bstarA;
    drag = dragA;
    raan = raanA*RADS_PER_DEG;

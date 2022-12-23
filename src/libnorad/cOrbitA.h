@@ -24,7 +24,7 @@ class cOrbitA
 {
 public:
    cOrbitA(std::string satNameA, int epochY, double epochD, double altitude, double ecc, double incl, double meanAnom, double bstarA,
-           double dragA, int satIndex, int planes, int satPerPlane, int raanA);
+           double dragA, int satIndex, int planes, int satPerPlane, double raanA, double argPerigeeA);
    virtual ~cOrbitA();
 
    // Return satellite ECI data at given minutes since element's epoch.

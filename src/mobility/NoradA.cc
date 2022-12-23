@@ -56,13 +56,14 @@ void NoradA::initializeMobility(const simtime_t& targetTime)
     double bstarA = par("bstar");
     double dragA = par("drag");
     double raanA = par("raan");
+    double argPerigeeA = par("argPerigee");
     planes = par("planes");
     satPerPlane = par("satPerPlane");
     int baseY = par("baseYear");
     double baseD = par("baseDay");
 
     //The new cOrbitA orbital propagator class is called which passes these Keplerian elements rather than the TLE file.
-    orbit = new cOrbitA(satNameA, epochY, epochD, altitude, ecc, incl, meanAnom, bstarA, dragA, satIndex, planes, satPerPlane, raanA);
+    orbit = new cOrbitA(satNameA, epochY, epochD, altitude, ecc, incl, meanAnom, bstarA, dragA, satIndex, planes, satPerPlane, raanA, argPerigeeA);
 
     // set the internal calendar time at which the simulation takes place
     if (baseY < 57)

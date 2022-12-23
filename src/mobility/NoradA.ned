@@ -20,6 +20,7 @@ parameters:
     double altitude = default(550);       //consistent between satellites
     double meanAnomaly = default(0);
     double raan = default(0);
+    double argPerigee = default(0);
     
     double bstar = default(0.00042243);
     double drag = default(0.00001846);

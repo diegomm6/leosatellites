@@ -76,6 +76,8 @@ protected:
     cCanvas *networkCanvas = nullptr;
     cMessage *refreshArea = nullptr;
 
+    int effectiveSlant = 0;
+
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
 
     // initialize module
