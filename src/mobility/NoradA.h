@@ -40,6 +40,7 @@ public:
 
     double getRaan();
     double getInclination();
+    bool isAscending();
 
     const int getSatelliteNumber(){return satelliteIndex;};
     const int getNumberOfPlanes(){return planes;}
