@@ -157,6 +157,18 @@ void SatelliteMobility::handleSelfMessage(cMessage *msg)
     }
 }
 
+void SatelliteMobility::updatePosition()
+{
+    nextChange = simTime();
+    moveAndUpdate();
+    if (displaySpanArea)
+    {
+        polygon->setVisible(false);
+        removeAllPoints();
+        setAllPoints();
+        polygon->setVisible(true);
+    }
+}
 void SatelliteMobility::removeAllPoints()
 {
     for (int i = 0; i < nPoints; i++)
