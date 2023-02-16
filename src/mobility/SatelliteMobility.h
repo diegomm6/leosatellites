@@ -35,6 +35,8 @@ class SatelliteMobility : public LineSegmentsMobilityBase
 public:
     SatelliteMobility();
 
+    // used to update the satellite positions from outside
+    void updatePosition();
     // returns x-position of satellite on playground (not longitude!)
     virtual double getPositionX() const                  { return lastPosition.x; };
 
